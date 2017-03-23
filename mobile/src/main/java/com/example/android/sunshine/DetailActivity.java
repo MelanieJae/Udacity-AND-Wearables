@@ -18,6 +18,8 @@ package com.example.android.sunshine;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -87,7 +89,6 @@ public class DetailActivity extends AppCompatActivity implements
     /* The URI that is used to access the chosen day's weather details */
     private Uri mUri;
 
-
     /*
      * This field is used for data binding. Normally, we would have to call findViewById many
      * times to get references to the Views in this Activity. With data binding however, we only
@@ -101,7 +102,6 @@ public class DetailActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         mUri = getIntent().getData();
@@ -109,6 +109,7 @@ public class DetailActivity extends AppCompatActivity implements
 
         /* This connects our Activity into the loader lifecycle. */
         getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
+
     }
 
     /**
@@ -169,6 +170,7 @@ public class DetailActivity extends AppCompatActivity implements
      *
      * @return the Intent to use to share our weather forecast
      */
+
     private Intent createShareForecastIntent() {
         Intent shareIntent = ShareCompat.IntentBuilder.from(this)
                 .setType("text/plain")
@@ -248,6 +250,10 @@ public class DetailActivity extends AppCompatActivity implements
 
         /* Set the resource ID on the icon to display the art */
         mDetailBinding.primaryInfo.weatherIcon.setImageResource(weatherImageId);
+        /* convert to bitmap to pass to werable as asset */
+        int weatherImageIdSmall = SunshineWeatherUtils.getSmallArtResourceIdForWeatherCondition(weatherId);
+        Bitmap icon = BitmapFactory.decodeResource(this.getResources(),
+                weatherImageIdSmall);
 
         /****************
          * Weather Date *
@@ -376,6 +382,7 @@ public class DetailActivity extends AppCompatActivity implements
         /* Store the forecast summary String in our forecast summary field to share later */
         mForecastSummary = String.format("%s - %s - %s/%s",
                 dateText, description, highString, lowString);
+
     }
 
     /**
@@ -385,7 +392,9 @@ public class DetailActivity extends AppCompatActivity implements
      *
      * @param loader The Loader that is being reset.
      */
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
+
 }
