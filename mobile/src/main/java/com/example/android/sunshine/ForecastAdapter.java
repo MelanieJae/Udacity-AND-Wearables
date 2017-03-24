@@ -28,6 +28,9 @@ import android.widget.TextView;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
  * from a {@link android.database.Cursor} to a {@link android.support.v7.widget.RecyclerView}.
@@ -36,6 +39,7 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
 
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE_DAY = 1;
+    public static Map<String, String> dataMap;
 
     /* The context we use to utility methods, app resources and layout inflaters */
     private final Context mContext;
@@ -136,7 +140,6 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
          ****************/
         int weatherId = mCursor.getInt(MainActivity.INDEX_WEATHER_CONDITION_ID);
         int weatherImageId;
-
         int viewType = getItemViewType(position);
 
         switch (viewType) {
@@ -214,6 +217,16 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
         forecastAdapterViewHolder.lowTempView.setText(lowString);
         forecastAdapterViewHolder.lowTempView.setContentDescription(lowA11y);
 
+        // data map for grabbing wearable display items to minimize cursor loads; passes back
+        // to main activity which in turn passes to the wearable
+        int weatherImageIdSmall = SunshineWeatherUtils
+                .getSmallArtResourceIdForWeatherCondition(weatherId);
+        dataMap = new HashMap<String, String>();
+        dataMap.put("date", dateString);
+        dataMap.put("high temp", highString);
+        dataMap.put("low temp", lowString);
+        dataMap.put("description", description);
+        dataMap.put("weatherIdString", String.valueOf(weatherImageIdSmall));
     }
 
     /**

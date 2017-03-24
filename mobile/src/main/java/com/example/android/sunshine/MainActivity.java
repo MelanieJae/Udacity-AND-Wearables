@@ -15,7 +15,6 @@
  */
 package com.example.android.sunshine;
 
-import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -44,6 +43,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
@@ -51,7 +51,7 @@ import com.google.android.gms.wearable.Wearable;
 import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>,
+        LoaderManager.LoaderCallbacks<Cursor>, DataApi.DataListener,
         ForecastAdapter.ForecastAdapterOnClickHandler, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
 
@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements
 
     /* used to sync data obtained in the mobile app with the wearable device to display there */
     private GoogleApiClient mGoogleApiClient;
+
+    public static final String UPDATE_PATH = "/update";
 
     /*
      * The columns of data that we are interested in displaying within our MainActivity's list of
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements
     private int mPosition = RecyclerView.NO_POSITION;
 
     private ProgressBar mLoadingIndicator;
+
     private Uri forecastQueryUri;
 
     @Override
@@ -175,13 +178,14 @@ public class MainActivity extends AppCompatActivity implements
         // initialize client object for sync of data to wearable; this is done in the Detail activity
         // minimize cursor creation by using already loaded cursor with info we need
         // and optimize use of cursor info alreayd being converted to display in the detail screen
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
         mGoogleApiClient.connect();
 
+        sendForecastStringToWearable();
 
     }
 
@@ -269,8 +273,16 @@ public class MainActivity extends AppCompatActivity implements
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
         if (data.getCount() != 0) showWeatherDataView();
-        Uri todayForecastUri = ContentUris.withAppendedId(forecastQueryUri, 1);
-        sendForecastToWearable(todayForecastUri);
+
+        // data map from adapter
+//        String dateString = ForecastAdapter.dataMap.get("date");
+//        String highTempString = ForecastAdapter.dataMap.get("high temp");
+//        String lowTempString = ForecastAdapter.dataMap.get("low temp");
+//        String descString = ForecastAdapter.dataMap.get("description");
+//        int weatherImageIdSmall = Integer.parseInt(ForecastAdapter.dataMap.get("weatherIdString"));
+//        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.art_clear);
+
+//        sendForecastStringToWearable("Today", "22", "11", "clear");
 
     }
 
@@ -391,16 +403,27 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    // create data items to send to wearable
-    public void sendForecastStringToWearable(String date, String highTemp, String lowTemp,
-                                       String description, Bitmap icon) {
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(STRINGS_PATH);
-//        putDataMapRequest.getDataMap().putString("date", date);
-//        putDataMapRequest.getDataMap().putString("high temp", highTemp);
-//        putDataMapRequest.getDataMap().putString("low temp", lowTemp);
-//        putDataMapRequest.getDataMap().putString("description", description);
-//        putDataMapRequest.getDataMap().put
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+//        for (DataEvent event : dataEvents) {
+//            if (event.getType() == DataEvent.TYPE_CHANGED) {
+//                mDataItemListAdapter.add(
+//                        new Event("DataItem Changed", event.getDataItem().toString()));
+//            } else if (event.getType() == DataEvent.TYPE_DELETED) {
+//                mDataItemListAdapter.add(
+//                        new Event("DataItem Deleted", event.getDataItem().toString()));
+//            }
+//        }
 
+    }
+
+    // create data items to send to wearable
+    public void sendForecastStringToWearable() {
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(UPDATE_PATH);
+        putDataMapRequest.getDataMap().putString("date", "Today");
+        putDataMapRequest.getDataMap().putString("high temp", "22");
+        putDataMapRequest.getDataMap().putString("low temp", "10");
+        putDataMapRequest.getDataMap().putString("description", "sunny");
 
         // fetch weather graphic to display on wearable by converting to an asset to place
         // in data map
@@ -418,7 +441,6 @@ public class MainActivity extends AppCompatActivity implements
                         } else {
                             Log.d(LOG_TAG, "Successfully sent weather data item");
                         }
-
                     }
                 });
     }
