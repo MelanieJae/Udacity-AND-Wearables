@@ -106,19 +106,19 @@ public class MainActivityWearable extends Activity
                     lowTempString = dataMapItem.getDataMap().getString("low temp");
                     description = dataMapItem.getDataMap().getString("description");
 
-                    // Loads image on background thread.
-//                    new LoadBitmapAsyncTask().execute(photoAsset);
+                     //Loads image on background thread.
+                    new LoadBitmapAsyncTask().execute(photoAsset);
 
-//                    ImageView iconView = (ImageView)findViewById(R.id.weather_icon);
-//                    TextView highTempView = (TextView)findViewById(R.id.high_temperature);
-//                    TextView lowTempView = (TextView)findViewById(R.id.low_temperature);
-//                    TextView descriptionView = (TextView)findViewById(R.id.weather_description);
+                    ImageView iconView = (ImageView)findViewById(R.id.weather_icon);
+                    TextView highTempView = (TextView)findViewById(R.id.high_temperature);
+                    TextView lowTempView = (TextView)findViewById(R.id.low_temperature);
+                    TextView descriptionView = (TextView)findViewById(R.id.weather_description);
 //
                     mDateView.setText(dateString);
                     Log.v(LOG_TAG, "date String= " + dateString);
-//                    highTempView.setText(highTempString);
-//                    lowTempView.setText(lowTempString);
-//                    descriptionView.setText(description);
+                    highTempView.setText(highTempString);
+                    lowTempView.setText(lowTempString);
+                    descriptionView.setText(description);
                 }
 
             }
