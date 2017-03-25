@@ -33,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/date"
+        android:textColor="@color/white"
         android:gravity="center"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -83,7 +84,7 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
     </RelativeLayout>
-    <!-- to allow horiz scrolling of wetaher forecast; horiz chosen because it allows for
+    <!-- to allow horiz scrolling of weather forecast; horiz chosen because it allows for
     larger typeface and easier readability -->
     <android.support.wearable.view.DotsPageIndicator
         android:layout_width="wrap_content"

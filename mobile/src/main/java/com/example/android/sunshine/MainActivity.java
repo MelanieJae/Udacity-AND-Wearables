@@ -50,6 +50,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>, DataApi.DataListener,
@@ -186,8 +187,21 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
         mGoogleApiClient.connect();
 
-        sendForecastStringToWearable();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        if ((mGoogleApiClient != null) && mGoogleApiClient.isConnected()) {
+            Wearable.DataApi.removeListener(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+        super.onPause();
     }
 
     /**
@@ -274,16 +288,6 @@ public class MainActivity extends AppCompatActivity implements
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
         if (data.getCount() != 0) showWeatherDataView();
-
-        // data map from adapter
-//        String dateString = ForecastAdapter.dataMap.get("date");
-//        String highTempString = ForecastAdapter.dataMap.get("high temp");
-//        String lowTempString = ForecastAdapter.dataMap.get("low temp");
-//        String descString = ForecastAdapter.dataMap.get("description");
-//        int weatherImageIdSmall = Integer.parseInt(ForecastAdapter.dataMap.get("weatherIdString"));
-//        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.art_clear);
-
-//        sendForecastStringToWearable("Today", "22", "11", "clear");
 
     }
 
@@ -391,36 +395,29 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        sendForecastStringToWearable();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        Log.e(LOG_TAG, "onConnectionSuspended(): Connection to Google API client was suspended");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        Log.e(LOG_TAG, "onConnectionSuspended(): Connection to Google API client was suspended");
     }
 
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
-//        for (DataEvent event : dataEvents) {
-//            if (event.getType() == DataEvent.TYPE_CHANGED) {
-//                mDataItemListAdapter.add(
-//                        new Event("DataItem Changed", event.getDataItem().toString()));
-//            } else if (event.getType() == DataEvent.TYPE_DELETED) {
-//                mDataItemListAdapter.add(
-//                        new Event("DataItem Deleted", event.getDataItem().toString()));
-//            }
-//        }
-
+        // no data being sent from wearable to handheld
     }
 
     // create data items to send to wearable
     public void sendForecastStringToWearable() {
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(UPDATE_PATH);
+        final PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(UPDATE_PATH);
+        // timestamp to ensure ondatachanged is called each time
+        putDataMapRequest.getDataMap().putLong("timestamp", new Date().getTime());
         putDataMapRequest.getDataMap().putString("date", "Today");
         putDataMapRequest.getDataMap().putString("high temp", "22");
         putDataMapRequest.getDataMap().putString("low temp", "10");
