@@ -28,18 +28,14 @@ import android.widget.TextView;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
  * from a {@link android.database.Cursor} to a {@link android.support.v7.widget.RecyclerView}.
  */
 class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapterViewHolder> {
 
-    private static final int VIEW_TYPE_TODAY = 0;
+    public static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE_DAY = 1;
-    public static Map<String, String> dataMap;
 
     /* The context we use to utility methods, app resources and layout inflaters */
     private final Context mContext;
@@ -221,12 +217,6 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
         // to main activity which in turn passes to the wearable
         int weatherImageIdSmall = SunshineWeatherUtils
                 .getSmallArtResourceIdForWeatherCondition(weatherId);
-        dataMap = new HashMap<String, String>();
-        dataMap.put("date", dateString);
-        dataMap.put("high temp", highString);
-        dataMap.put("low temp", lowString);
-        dataMap.put("description", description);
-        dataMap.put("weatherIdString", String.valueOf(weatherImageIdSmall));
     }
 
     /**

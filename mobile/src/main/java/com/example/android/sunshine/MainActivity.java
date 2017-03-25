@@ -39,8 +39,10 @@ import android.widget.ProgressBar;
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.sync.SunshineSyncUtils;
+import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
@@ -50,7 +52,6 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>, DataApi.DataListener,
@@ -58,6 +59,14 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener{
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private long date;
+    private String highTempString;
+    private String lowTempString;
+    private String descString;
+    private int weatherId;
+    private String description;
+    private String descriptionA11y;
+    private int weatherImageId;
 
     /* used to sync data obtained in the mobile app with the wearable device to display there */
     private GoogleApiClient mGoogleApiClient;
@@ -108,6 +117,16 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast);
         getSupportActionBar().setElevation(0f);
+
+        // initialize client object for sync of data to wearable; this is done in the Detail activity
+        // minimize cursor creation by using already loaded cursor with info we need
+        // and optimize use of cursor info alreayd being converted to display in the detail screen
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        mGoogleApiClient.connect();
 
         /*
          * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
@@ -176,16 +195,6 @@ public class MainActivity extends AppCompatActivity implements
 
         // initialize data sync from URL
         SunshineSyncUtils.initialize(this);
-
-        // initialize client object for sync of data to wearable; this is done in the Detail activity
-        // minimize cursor creation by using already loaded cursor with info we need
-        // and optimize use of cursor info alreayd being converted to display in the detail screen
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        mGoogleApiClient.connect();
 
     }
 
@@ -288,7 +297,17 @@ public class MainActivity extends AppCompatActivity implements
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
         if (data.getCount() != 0) showWeatherDataView();
-
+        data.moveToFirst();
+        date = data.getLong(INDEX_WEATHER_DATE);
+        highTempString = data.getString(INDEX_WEATHER_MAX_TEMP);
+        lowTempString = data.getString(INDEX_WEATHER_MIN_TEMP);
+        weatherId = data.getInt(INDEX_WEATHER_CONDITION_ID);
+        description = SunshineWeatherUtils.getStringForWeatherCondition(this, weatherId);
+             /* Create the accessibility (a11y) String from the weather description */
+        descString = this.getString(R.string.a11y_forecast, description);
+        weatherImageId = SunshineWeatherUtils
+                .getSmallArtResourceIdForWeatherCondition(weatherId);
+        sendForecastToWearable(String.valueOf(date), highTempString, lowTempString, descString, weatherImageId);
     }
 
     /**
@@ -395,7 +414,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        sendForecastStringToWearable();
+        Log.d(LOG_TAG, "Connection to Google API client was successful");
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
@@ -410,28 +430,33 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
-        // no data being sent from wearable to handheld
+        Log.d(LOG_TAG, "onDataChanged():");
     }
 
     // create data items to send to wearable
-    public void sendForecastStringToWearable() {
+    public void sendForecastToWearable(String date, String highTemp, String lowTemp, String description,
+                                       int weatherImageId) {
+        Log.d(LOG_TAG, "sendForecastToWearable():");
+
         final PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(UPDATE_PATH);
         // timestamp to ensure ondatachanged is called each time
-        putDataMapRequest.getDataMap().putLong("timestamp", new Date().getTime());
-        putDataMapRequest.getDataMap().putString("date", "Today");
-        putDataMapRequest.getDataMap().putString("high temp", "22");
-        putDataMapRequest.getDataMap().putString("low temp", "10");
-        putDataMapRequest.getDataMap().putString("description", "sunny");
+        putDataMapRequest.getDataMap().putLong("timestamp", System.currentTimeMillis());
+        putDataMapRequest.getDataMap().putString("date", date);
+        putDataMapRequest.getDataMap().putString("high temp", highTemp);
+        putDataMapRequest.getDataMap().putString("low temp", lowTemp);
+        putDataMapRequest.getDataMap().putString("description", description);
 
         // fetch weather graphic to display on wearable by converting to an asset to place
         // in data map
-        Asset iconAsset = createAssetFromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.art_clear));
-//         place asset in data map
+        Asset iconAsset = createAssetFromBitmap(BitmapFactory.decodeResource(getResources(),
+                weatherImageId));
+        // place asset in data map
         putDataMapRequest.getDataMap().putAsset("weather icon", iconAsset);
 
         PutDataRequest request = putDataMapRequest.asPutDataRequest();
-        Wearable.DataApi.putDataItem(mGoogleApiClient, request)
-                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+        request.setUrgent();
+        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, request);
+        pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
                     @Override
                     public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
                         if (!dataItemResult.getStatus().isSuccess()) {
@@ -445,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private static Asset createAssetFromBitmap(Bitmap bitmap) {
         final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
         return Asset.createFromBytes(byteStream.toByteArray());
     }
 }

@@ -52,17 +52,17 @@ public class MainActivityWearable extends WearableActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-//        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-//            @Override
-//            public void onLayoutInflated(WatchViewStub stub) {
-//                dateView = (TextView) stub.findViewById(R.id.date);
-//                iconView = (ImageView)findViewById(R.id.weather_icon);
-//                highTempView = (TextView)findViewById(R.id.high_temperature);
-//                lowTempView = (TextView)findViewById(R.id.low_temperature);
-//                descView = (TextView)findViewById(R.id.weather_description);
-//                digitalClock = (DigitalClock)findViewById(R.id.clock);
-//            }
-//        });
+        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
+            @Override
+            public void onLayoutInflated(WatchViewStub stub) {
+                dateView = (TextView) stub.findViewById(R.id.date);
+                iconView = (ImageView)findViewById(R.id.weather_icon);
+                highTempView = (TextView)findViewById(R.id.high_temperature);
+                lowTempView = (TextView)findViewById(R.id.low_temperature);
+                descView = (TextView)findViewById(R.id.weather_description);
+                digitalClock = (DigitalClock)findViewById(R.id.clock);
+            }
+        });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
@@ -147,34 +147,19 @@ public class MainActivityWearable extends WearableActivity
                     Asset photoAsset = dataMapItem.getDataMap()
                             .getAsset(IMAGE_KEY);
                     long timestamp = dataMapItem.getDataMap().getLong("timestamp");
-                    dateString = dataMapItem.getDataMap().getString("date");
-                    Log.v(LOG_TAG, "date String= " + dateString);
+                    dateString = dataMapItem.getDataMap().getLong("date");
                     highTempString = dataMapItem.getDataMap().getString("high temp");
                     lowTempString = dataMapItem.getDataMap().getString("low temp");
                     description = dataMapItem.getDataMap().getString("description");
 
                      //Loads image on background thread.
                     new LoadBitmapAsyncTask().execute(photoAsset);
-                    stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-                        @Override
-                        public void onLayoutInflated(WatchViewStub stub) {
-                            dateView = (TextView) stub.findViewById(R.id.date);
-                            iconView = (ImageView)findViewById(R.id.weather_icon);
-                            highTempView = (TextView)findViewById(R.id.high_temperature);
-                            lowTempView = (TextView)findViewById(R.id.low_temperature);
-                            descView = (TextView)findViewById(R.id.weather_description);
-                            digitalClock = (DigitalClock)findViewById(R.id.clock);
-                        }
-                    });
 
                     dateView.setText(dateString);
-                    Log.v(LOG_TAG, "date String= " + dateString);
                     highTempView.setText(highTempString);
                     lowTempView.setText(lowTempString);
                     descView.setText(description);
-
                 }
-
             }
         }
         mGoogleApiClient.disconnect();
