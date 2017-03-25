@@ -18,6 +18,7 @@ package com.example.android.sunshine;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -427,9 +428,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // fetch weather graphic to display on wearable by converting to an asset to place
         // in data map
-//        Asset iconAsset = createAssetFromBitmap(icon);
-        // place asset in data map
-//        putDataMapRequest.getDataMap().putAsset("weather icon", iconAsset);
+        Asset iconAsset = createAssetFromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.art_clear));
+//         place asset in data map
+        putDataMapRequest.getDataMap().putAsset("weather icon", iconAsset);
 
         PutDataRequest request = putDataMapRequest.asPutDataRequest();
         Wearable.DataApi.putDataItem(mGoogleApiClient, request)
@@ -447,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private static Asset createAssetFromBitmap(Bitmap bitmap) {
         final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
         return Asset.createFromBytes(byteStream.toByteArray());
     }
 }
