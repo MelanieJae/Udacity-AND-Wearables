@@ -147,7 +147,7 @@ public class MainActivityWearable extends WearableActivity
                     Asset photoAsset = dataMapItem.getDataMap()
                             .getAsset(IMAGE_KEY);
                     long timestamp = dataMapItem.getDataMap().getLong("timestamp");
-                    dateString = dataMapItem.getDataMap().getLong("date");
+                    dateString = dataMapItem.getDataMap().getString("date");
                     highTempString = dataMapItem.getDataMap().getString("high temp");
                     lowTempString = dataMapItem.getDataMap().getString("low temp");
                     description = dataMapItem.getDataMap().getString("description");

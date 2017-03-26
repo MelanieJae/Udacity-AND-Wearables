@@ -22,7 +22,7 @@
             <intent-filter>
                 <!-- listeners receive events that match the action and data filters -->
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-                <data android:scheme="wear" android:host="*" android:pathPrefix="/count"/>
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/update"/>
             </intent-filter>
         </activity>
     </application>
@@ -33,12 +33,8 @@
         <intent-filter>
             <!-- listeners receive events that match the action and data filters -->
             <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-            <data android:scheme="wear" android:host="*" android:pathPrefix="/count"/>
+            <data android:scheme="wear" android:host="*" android:pathPrefix="/update"/>
         </intent-filter>
-        <intent-filter>
-            <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-            <data android:scheme="wear" android:host="*" android:pathPrefix="/start-activity"/>
-        </intent-filter>
-    </service>
+     </service>
 
 </manifest>
