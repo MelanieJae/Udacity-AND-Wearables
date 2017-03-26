@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/mobile/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="2f1a20e522fcd55e6507b1fd5bcc92cf0b25294c">
+        <dex dex="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/mobile/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_ff103f7eec04112f5e61804680066562116ab2a4/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/wearable/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="5f1604b2d00ddb0c49a79d274d8ed6abff7d2851">
+        <dex dex="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/wearable/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_bbb9766389c1800c9fe54a07f9f3f9fb8ce03a61/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/mobile/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/mobile/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_ad65f231b620efb681edb28fd522cf20d4882a06/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/wearable/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="/Users/melanieh/AndroidStudioProjects/Udacity-AND-Wearables/wearable/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_9d177a043f14fea4fd580c79dfbec377984185d0/classes.dex" />
+    </item>
+
+</items>
